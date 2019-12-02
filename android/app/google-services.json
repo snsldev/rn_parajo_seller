@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "494128584884",
+    "firebase_url": "https://emerald-result-236507.firebaseio.com",
+    "project_id": "emerald-result-236507",
+    "storage_bucket": "emerald-result-236507.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:494128584884:android:183e3a89d6a5c52d609fe1",
+        "android_client_info": {
+          "package_name": "com.parajo.seller"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "494128584884-r18qv230tm6o7vu26de97lf9p2ckttsj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgZ2-tJ4JSNdMzguoASNF4btFeuurPaVQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "494128584884-r18qv230tm6o7vu26de97lf9p2ckttsj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:494128584884:android:46cae149f51c2106609fe1",
+        "android_client_info": {
+          "package_name": "com.webviewtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "494128584884-r18qv230tm6o7vu26de97lf9p2ckttsj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgZ2-tJ4JSNdMzguoASNF4btFeuurPaVQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "494128584884-r18qv230tm6o7vu26de97lf9p2ckttsj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
