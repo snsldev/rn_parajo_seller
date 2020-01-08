@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {SafeAreaView , ScrollView, RefreshControl, StyleSheet, View, Modal, Text, Button, Platform, Alert } from 'react-native';
+import {BackHandler, SafeAreaView , ScrollView, RefreshControl, StyleSheet, View, Modal, Text, Button, Platform, Alert } from 'react-native';
 import firebase from 'react-native-firebase';
 import { WebView } from 'react-native-webview';
 
@@ -15,21 +15,50 @@ export default class App extends Component {
         //uri : 'http://10.96.9.12:8080',
         refreshing : false,
         refreshing_enable : false,
+        canGoBack: false,
     };
     user = null;
     webview = null;
     fcmToken = null;
+   
   }
 
   async componentDidMount(){
     this._checkPermission();
     this.createNotificationChannel();
     this._listenForNotifications(); 
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
   }
 
   componentWillUnmount() {
     this.notificationOpenedListener();
     this.notificationListener();
+    this.backHandler.remove()
+  }
+
+  handleBackPress = () => {
+    if (!this.state.canGoBack) {
+      //메인페이지이면 종료 Alert
+      Alert.alert(
+        '파라조',
+        '종료하시겠습니까?',
+        [
+          {
+            text: '아니오',
+            style: 'cancel',
+          },
+          {text: '예', onPress: BackHandler.exitApp},
+        ],
+        {cancelable: true},
+      );
+      //console.log('alert state!');
+    }
+    else{
+      //아니면 뒤로가기수행
+      this.webview.goBack();
+      //console.log('back!');
+    }
+    return true;
   }
 
   async _checkPermission(){
@@ -37,9 +66,8 @@ export default class App extends Component {
     if (enabled) {
       fcmToken = await firebase.messaging().getToken();
         // user has permissions
-        console.log('enabled: ',enabled);
-        console.log('fcmToken: ',fcmToken);
-       
+        //console.log('enabled: ',enabled);
+        //console.log('fcmToken: ',fcmToken);
     } else {
         // user doesn't have permission
         this._requestPermission();
@@ -49,9 +77,9 @@ export default class App extends Component {
   async _requestPermission(){
     firebase.messaging().requestPermission().then(async () => {
       // User has authorised  
-      console.log('requestPermission: ');
+      //console.log('requestPermission: ');
       fcmToken = await firebase.messaging().getToken();
-      console.log('fcmToken: ',fcmToken);
+      //console.log('fcmToken: ',fcmToken);
     })
     .catch(error => {
       alert("you can't handle push notification"+error.message);
@@ -90,14 +118,16 @@ export default class App extends Component {
       //앱활성화시로컬 push 띄우기
       notification.android.setChannelId('reminder'); //미리 만들어진 채널 set
       notification.android.setAutoCancel(true);
+      notification.android.setSmallIcon('@mipmap/ic_stat_name');
+      notification.android.setColor('#F4B400');
       firebase.notifications().displayNotification(notification); //push 알림 보여주기
       
-      console.log('onNotification', notification);
+      //console.log('onNotification', notification);
     });
     
     //앱이 foreground, background에서 실행 중일때, push 알림을 클릭하여 열 때, 해당 push 알림을 처리하게 됩니다.  
     this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => { 
-      console.log('onNotificationOpened');
+      //console.log('onNotificationOpened');
       // Get information about the notification that was opened
       const notification = notificationOpen.notification;
       //console.log('notification', notification);
@@ -110,10 +140,10 @@ export default class App extends Component {
     //앱이 종료된 상황에서 push 알림을 클릭하여 열 때, 해당 push 알림을 처리하게 됩니다
     const notificationOpen = await firebase.notifications().getInitialNotification();
     if (notificationOpen) {
-      console.log('when getInitialNotification');
+      //console.log('when getInitialNotification');
 
       const notification = notificationOpen.notification;
-      console.log('notification: ', notification);
+      //console.log('notification: ', notification);
       const type = notification.data.type;
       
       //알림이면 넘어온 url 로 리다이렉트
@@ -159,17 +189,22 @@ export default class App extends Component {
     //   canGoBack?: boolean;
     //   canGoForward?: boolean;
     // }
-    // const { url } = newNavState;
+    const { url, canGoBack } = newNavState;
+   // console.log('canGoBack: ', canGoBack);
+    this.setState({canGoBack : canGoBack});
     // if (!url) return;
+    //  console.log('url', url);
 
-    // console.log('url',url);
+    //  let url_arr = url.split(this.uri);
+    //  console.log(url_arr[0]);
+    //  console.log(url_arr[1]);
 
-    // if (url.includes('login')) {
+    // if (url.includes('')) {
     //   console.log('로그인이당');
-    //   //this.webview.stopLoading();
-    //   // open a modal login viewer
-    //   //this.showModalMain(true);
-    // }
+      //this.webview.stopLoading();
+      // open a modal login viewer
+      //this.showModalMain(true);
+    //}
     // redirect somewhere else
     // if (url.includes('google.com')) {
     //   const newURL = 'https://facebook.github.io/react-native/';
@@ -186,13 +221,13 @@ export default class App extends Component {
      try {
          msgData = JSON.parse(event.nativeEvent.data) || {}
      } catch (error) {
-         console.error(error)
-         return
+         //console.error(error);
+         return;
      }
      this[msgData.targetFunc].apply(this, [msgData]);
    };
 
-    //웹뷰에서 로그인 성공후 콜백
+  //웹뷰에서 로그인 성공후 콜백
   loginCallback = msgData => {
     console.log('call loginCallback isSuccessfull: ', msgData.data.isSuccessfull);
     const isSuccessfull = msgData.data.isSuccessfull;
@@ -224,7 +259,7 @@ export default class App extends Component {
         [
           {
             text: '확인',
-            onPress: () => console.log('확인 누름'),
+            onPress: () => {},
             //style: 'cancel',
           },
         ],
