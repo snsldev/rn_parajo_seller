@@ -7,39 +7,37 @@ export default class App extends Component {
 
   constructor(props) {
     super(props);
- 
-    this.state = { 
-        key : 0,
-        //ModalVisibleStatus: false, 
-        uri : 'http://dev.parajo.com',
-        refreshing : false,
-        refreshing_enable : false,
-        canGoBack: false,
-        isSplashVisible : true,
+
+    this.state = {
+      key: 0,
+      uri: 'http://dev.parajo.com',
+      refreshing: false,
+      refreshing_enable: false,
+      canGoBack: false,
+      isSplashVisible: true,
     };
-    
-    imageRequire =null;
+
+    imageRequire = null;
     user = null;
     webview = null;
     fcmToken = null;
   }
 
-  async componentDidMount(){
-    
+  async componentDidMount() {
+
     this.requireSplashImg();
     this.timeShadeSplashScreen();
     // this._checkPermission();
     // this.createNotificationChannel();
     // this._listenForNotifications(); 
-    // this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress); //백버튼 눌렀을때
   }
 
   componentWillUnmount() {
     // this.notificationOpenedListener();
     // this.notificationListener();
-    // this.backHandler.remove()
+    this.backHandler.remove();
   }
-
 
   handleBackPress = () => {
     if (!this.state.canGoBack) {
@@ -160,8 +158,6 @@ export default class App extends Component {
 
   };
 
-  
-
   //채널생성: 앱활성화시에 푸쉬알림뜨게할라면 해야함
   createNotificationChannel = () => {
     // Build a android notification channel
@@ -175,63 +171,26 @@ export default class App extends Component {
     firebase.notifications().android.createChannel(channel);
   };
 
-  //로그인 프로세스 진행
-  // loginProcess  = (email, password)=>{
-  //   //웹뷰에 자바스크립트 실행명령어 전달
-  //     user={email, password};
-  //   // console.log(obj);
-  //     var user_json = JSON.stringify(user);
-  //     const run = `RNCalllBackLogin('${user_json}')`;
-  //     this.webview.injectJavaScript(run);
-  // };
 
   handleWebViewNavigationStateChange = newNavState => {
-    // newNavState looks something like this:
-    // {
-    //   url?: string;
-    //   title?: string;
-    //   loading?: boolean;
-    //   canGoBack?: boolean;
-    //   canGoForward?: boolean;
-    // }
+
     const { url, canGoBack } = newNavState;
-   // console.log('canGoBack: ', canGoBack);
     this.setState({canGoBack : canGoBack});
-    // if (!url) return;
-    //  console.log('url', url);
-
-    //  let url_arr = url.split(this.uri);
-    //  console.log(url_arr[0]);
-    //  console.log(url_arr[1]);
-
-    // if (url.includes('')) {
-    //   console.log('로그인이당');
-      //this.webview.stopLoading();
-      // open a modal login viewer
-      //this.showModalMain(true);
-    //}
-    // redirect somewhere else
-    // if (url.includes('google.com')) {
-    //   const newURL = 'https://facebook.github.io/react-native/';
-    //   const redirectTo = 'window.location = "' + newURL + '"';
-    //   this.webview.injectJavaScript(redirectTo);
-    // }
   };
 
   //웹에서 호출한 함수와 메시지를 받는 콜백함수
-  handleDataReceived = event =>{
-    // console.log('handleDataReceived data', data);
- 
-     //console.log('onWebViewMessage', JSON.parse(event.nativeEvent.data))
-     let msgData;
-     try {
-         msgData = JSON.parse(event.nativeEvent.data) || {}
-     } catch (error) {
-         //console.error(error);
-         return;
-     }
-     this[msgData.targetFunc].apply(this, [msgData]);
-   };
+  handleDataReceived = event => {
+    // console.log('handleDataReceived data', data); 
+    //console.log('onWebViewMessage', JSON.parse(event.nativeEvent.data))
+    let msgData;
+    try {
+      msgData = JSON.parse(event.nativeEvent.data) || {}
+    } catch (error) {
+      //console.error(error);
+      return;
+    }
+    this[msgData.targetFunc].apply(this, [msgData]);
+  };
 
   //웹뷰에서 로그인 성공후 콜백
   loginCallback = msgData => {
@@ -342,8 +301,6 @@ export default class App extends Component {
   }
 
   render() {
-    console.log('render');
-    console.log('this.state.isSplashVisible: '+this.state.isSplashVisible);
 
     let Splash_Screen = (
       <View style={styles.SplashScreen_RootView}>
@@ -370,7 +327,6 @@ export default class App extends Component {
           source={{ uri: this.state.uri }}
           onNavigationStateChange={this.handleWebViewNavigationStateChange}
           onMessage={this.handleDataReceived}
-       //   injectedJavaScript={this.INJECTED_JAVASCRIPT}
           cacheEnabled={false}
         /> }
         </ScrollView>
