@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import {BackHandler, SafeAreaView , ScrollView, RefreshControl, StyleSheet, View, Modal, Text, Button, Platform, Alert } from 'react-native';
+import React, { Component, StrictMode } from 'react';
+import {BackHandler, SafeAreaView , ScrollView, RefreshControl, StyleSheet, View, Modal, Text, Button, Image , Platform, Alert } from 'react-native';
 import firebase from 'react-native-firebase';
 import { WebView } from 'react-native-webview';
 
@@ -10,31 +10,36 @@ export default class App extends Component {
  
     this.state = { 
         key : 0,
-        ModalVisibleStatus: false, 
-        uri : 'http://parajo.kr',
-        //uri : 'http://10.96.9.12:8080',
+        //ModalVisibleStatus: false, 
+        uri : 'http://dev.parajo.com',
         refreshing : false,
         refreshing_enable : false,
         canGoBack: false,
+        isSplashVisible : true,
     };
+    
+    imageRequire =null;
     user = null;
     webview = null;
     fcmToken = null;
-   
   }
 
   async componentDidMount(){
-    this._checkPermission();
-    this.createNotificationChannel();
-    this._listenForNotifications(); 
-    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+    
+    this.requireSplashImg();
+    this.timeShadeSplashScreen();
+    // this._checkPermission();
+    // this.createNotificationChannel();
+    // this._listenForNotifications(); 
+    // this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
   }
 
   componentWillUnmount() {
-    this.notificationOpenedListener();
-    this.notificationListener();
-    this.backHandler.remove()
+    // this.notificationOpenedListener();
+    // this.notificationListener();
+    // this.backHandler.remove()
   }
+
 
   handleBackPress = () => {
     if (!this.state.canGoBack) {
@@ -171,14 +176,14 @@ export default class App extends Component {
   };
 
   //로그인 프로세스 진행
-  loginProcess  = (email, password)=>{
-    //웹뷰에 자바스크립트 실행명령어 전달
-      user={email, password};
-    // console.log(obj);
-      var user_json = JSON.stringify(user);
-      const run = `RNCalllBackLogin('${user_json}')`;
-      this.webview.injectJavaScript(run);
-  };
+  // loginProcess  = (email, password)=>{
+  //   //웹뷰에 자바스크립트 실행명령어 전달
+  //     user={email, password};
+  //   // console.log(obj);
+  //     var user_json = JSON.stringify(user);
+  //     const run = `RNCalllBackLogin('${user_json}')`;
+  //     this.webview.injectJavaScript(run);
+  // };
 
   handleWebViewNavigationStateChange = newNavState => {
     // newNavState looks something like this:
@@ -213,6 +218,7 @@ export default class App extends Component {
     // }
   };
 
+  //웹에서 호출한 함수와 메시지를 받는 콜백함수
   handleDataReceived = event =>{
     // console.log('handleDataReceived data', data);
  
@@ -277,13 +283,13 @@ export default class App extends Component {
     this.webview.injectJavaScript(redirectTo); //js실행
   };
 
-  scrollTopCallback = (msgData) => {
+ /*  scrollTopCallback = (msgData) => {
     
     scrollTop = (msgData.data.scrollTop == 0)? true : false;
-    //console.log('scrollTop is : ', scrollTop);
+    console.log('scrollTop is : ', scrollTop);
     this.setState({refreshing_enable : scrollTop});
 
-  }
+  } */
   
   onRefresh = () => {
     //console.log('onRefresh!');
@@ -301,15 +307,61 @@ export default class App extends Component {
     });
   }
 
+  hide_Splash_Screen=()=>{
+      this.setState({ isSplashVisible : false});
+  }
+
+  timeShadeSplashScreen(){
+    that = this;
+    setTimeout(function () {
+      that.hide_Splash_Screen();
+    }, 4000);
+
+  }
+
+  getRandNum(min, max){
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
+  }
+
+  requireSplashImg(){
+    if(imageRequire) return;
+
+    let randnum = this.getRandNum(0,3);
+
+    if (randnum ==0){
+      imageRequire = require('./img/splash_image1.png');
+    }
+    else if (randnum ==1){
+      imageRequire = require('./img/splash_image2.png');
+    }
+    else if (randnum ==2){
+      imageRequire = require('./img/splash_image3.png');
+    }
+  }
+
   render() {
+    console.log('render');
+    console.log('this.state.isSplashVisible: '+this.state.isSplashVisible);
+
+    let Splash_Screen = (
+      <View style={styles.SplashScreen_RootView}>
+        <View style={styles.SplashScreen_ChildView}>
+          <Image source={imageRequire} style={{width:'100%', height: '100%', resizeMode:'cover'}}/>
+        </View>
+      </View> 
+    );
+
     return (
+      
       <SafeAreaView style = {styles.MainContainer}>
         <ScrollView
         contentContainerStyle={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={this.state.refreshing} enabled={this.state.refreshing_enable} onRefresh={this.onRefresh}/>
-        }
-      >
+        } 
+        >
         { <WebView
           bounces={false}
           enableNavigate={false}
@@ -322,22 +374,36 @@ export default class App extends Component {
           cacheEnabled={false}
         /> }
         </ScrollView>
+        {
+          (this.state.isSplashVisible === true) ? Splash_Screen: null
+        }
       </SafeAreaView>
+      
     );
   }
 }
 
-const styles = StyleSheet.create ({
-  MainContainer : {
-    flex:1,
-    // justifyContent: 'center',
-    //  alignItems: 'center',
+const styles = StyleSheet.create({
+  MainContainer: {
+    flex: 1,
     marginTop: (Platform.OS == 'ios') ? 20 : 0
-},
-scrollView: {
-  flex: 1,
-  //backgroundColor: 'pink',
-  //alignItems: 'center',
-  justifyContent: 'center',
-},
-})
+  },
+  scrollView: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  SplashScreen_RootView: {
+    justifyContent: 'center',
+    flex: 1,
+    // margin: 20,
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  SplashScreen_ChildView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: '#c2ff29',
+    flex: 1,
+  },
+});
