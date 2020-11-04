@@ -10,7 +10,7 @@ export default class App extends Component {
 
     this.state = {
       key: 0,
-      uri: 'http://dev.parajo.com',
+      uri: 'https://dev.parajo.com',
       refreshing: false,
       refreshing_enable: false,
       canGoBack: false,
@@ -180,8 +180,8 @@ export default class App extends Component {
 
   //웹에서 호출한 함수와 메시지를 받는 콜백함수
   handleDataReceived = event => {
-    // console.log('handleDataReceived data', data); 
-    //console.log('onWebViewMessage', JSON.parse(event.nativeEvent.data))
+    console.log('handleDataReceived data', data); 
+    console.log('onWebViewMessage', JSON.parse(event.nativeEvent.data))
     let msgData;
     try {
       msgData = JSON.parse(event.nativeEvent.data) || {}
@@ -236,19 +236,19 @@ export default class App extends Component {
   //알림을 받은 후 웹뷰 url 리다이렉트
   redirectPage = uri => {
     //data내의 url 파라미터를 확인후 해당페이지로 보낸다
-    //
     const newURL = uri;
     const redirectTo = 'window.location = "' + newURL + '"';
     this.webview.injectJavaScript(redirectTo); //js실행
   };
 
- /*  scrollTopCallback = (msgData) => {
+  //스크롤 콜백
+  /*scrollTopCallback = (msgData) => {
     
     scrollTop = (msgData.data.scrollTop == 0)? true : false;
     console.log('scrollTop is : ', scrollTop);
     this.setState({refreshing_enable : scrollTop});
 
-  } */
+  }*/
   
   onRefresh = () => {
     //console.log('onRefresh!');
@@ -311,7 +311,6 @@ export default class App extends Component {
     );
 
     return (
-      
       <SafeAreaView style = {styles.MainContainer}>
         <ScrollView
         contentContainerStyle={styles.scrollView}
@@ -326,8 +325,10 @@ export default class App extends Component {
           ref={ref => (this.webview = ref)}
           source={{ uri: this.state.uri }}
           onNavigationStateChange={this.handleWebViewNavigationStateChange}
-          onMessage={this.handleDataReceived}
+          // onMessage={this.handleDataReceived}
           cacheEnabled={false}
+          // pullToRefreshEnabled={true}
+          cacheMode={'LOAD_NO_CACHE'}
         /> }
         </ScrollView>
         {
