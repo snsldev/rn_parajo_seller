@@ -131,8 +131,8 @@ android {
         applicationId "com.parajo.seller"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
-        versionName "7"
+        versionCode 8
+        versionName "8.0"
     }
 
     packagingOptions {

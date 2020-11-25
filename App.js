@@ -10,7 +10,7 @@ export default class App extends Component {
 
     this.state = {
       key: 0,
-      uri: 'https://dev.parajo.com',
+      uri: 'https://m.parajo.com',
       refreshing: false,
       refreshing_enable: false,
       canGoBack: false,
